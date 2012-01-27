@@ -15,7 +15,7 @@
 </div>
 
 <div id="modal-show-collections" class="modal">
-  <h2>Collectionsxx</h2>
+  <h2>Collections</h2>
 
   <ul id="collections">
   <% if @collection_names.size == 0 %>
@@ -25,7 +25,7 @@
       <li>
         <%= collection %>
         <ul>
-          <li><a href="/indexes/<%= URI.encode(collection) %>">Indexes</a></li>
+          <li><a href="/indexes/<%= @database_name + '/' + URI.encode(collection) %>">Indexes</a></li>
         </ul>
       </li>
     <% end %>

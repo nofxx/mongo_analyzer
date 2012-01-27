@@ -41,15 +41,15 @@ skipped_collections = ["system.users", "system.indexes", "system.profile"]
 
 get '/' do
   conn = connect false
-  @databases = conn.database_info
+  @databases = conn.database_info.sort_by {|k,v| v}.reverse
   # skipped_databases.each...
   @stats = conn.server_info
 
   erb :home
 end
 
-get '/:collection' do
-  @database_name = params[:collection]
+get '/:database' do
+  @database_name = params[:database]
   db = connect @database_name
   @collection_names = db.collection_names
   skipped_collections.each { |collection| @collection_names.delete(collection) }
@@ -69,32 +69,23 @@ get '/:collection' do
   erb :collection
 end
 
-
-
-get '/indexes/:collection' do
-  coll = db.collection(params[:collection])
-  @indexes = coll.index_information
-
-  erb :indexes
-end
-
 # should be a post, but fuck this shit.
-get '/profiling_level/:collection/:what' do
-  @collection = params[:collection]
-  db = connect @collection
+get '/profiling_level/:database/:what' do
+  @database = params[:database]
+  db = connect @database
   allowed_types = [:off, :slow_only, :all]
   what = params[:what].to_sym
 
   if allowed_types.include?(what)
     db.profiling_level = what
-    redirect "/#@collection"
+    redirect "/#@database"
   else
     "Not allowed profiling level: #{what}. Allowed: #{allowed_types.inspect}"
   end
 end
 
-get '/clear_query_log/:collection' do
-  db = connect params[:collection]
+get '/clear_query_log/:database' do
+  db = connect params[:database]
   # We must disable profiling before dropping the profile collection.
   old_profile_level = db.profiling_level
   db.profiling_level = :off
@@ -105,16 +96,27 @@ get '/clear_query_log/:collection' do
   # Set profiling level back to old state.
   db.profiling_level = old_profile_level
 
-  redirect "/#{params[:collection]}"
+  redirect "/#{params[:database]}"
 end
 
-get '/drop_index/:collection/:index' do
+
+get '/indexes/:database/:collection' do
+  db = connect params[:database]
+  coll = db.collection(params[:collection])
+  @indexes = coll.index_information
+
+  erb :indexes
+end
+
+get '/drop_index/:database/:collection/:index' do
+  db = connect params[:database]
   coll = db.collection(params[:collection])
   coll.drop_index(params[:index])
-  redirect "/indexes/#{URI.escape(params[:collection])}"
+  redirect "/indexes/#{params[:database]}/#{URI.escape(params[:collection])}"
 end
 
-post '/add_index/:collection' do
+post '/add_index/:database/:collection' do
+  db = connect params[:database]
   if params[:ordering] == nil or params[:ordering].length == 0
     ordering = Mongo::ASCENDING
   else
@@ -132,5 +134,5 @@ post '/add_index/:collection' do
   coll = db.collection(params[:collection])
   coll.create_index([[params[:index], ordering]], options)
 
-  redirect "/indexes/#{URI.escape(params[:collection])}"
+  redirect "/indexes/#{params[:database]}/#{URI.escape(params[:collection])}"
 end
