@@ -127,9 +127,10 @@ post '/add_index/:database/:collection' do
     end
   end
 
-  options = Hash.new
-  options[:unique] = true if params[:unique] != nil and params[:unique] == "true"
-  options[:background] = true if params[:background] != nil and params[:background] == "true"
+  options = {}
+  [:unique, :sparse, :background].each do |opt|
+    options[opt] = true if params[opt] != nil and params[opt] == "true"
+  end
 
   coll = db.collection(params[:collection])
   coll.create_index([[params[:index], ordering]], options)

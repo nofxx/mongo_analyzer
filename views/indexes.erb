@@ -1,5 +1,5 @@
 <div class="back">
-  <a href="/">Back to overview</a>
+  <a href="/<%= params[:database] %>">Back to overview</a>
 </div>
 
     <h1>Indexes of collection: <%= params[:collection] %> (<%= params[:database] %>)</h1>
@@ -28,12 +28,11 @@
   <input type="radio" name="ordering" value="descending" id="ordering-descending">
   <label for="ordering-descending">Descending</label>
 
-  <br />
-  <input type="checkbox" name="background" id="background" value="true" %>
-  <label for="background">Background</label>
-
-  <input type="checkbox" name="unique" id="unique" value="true" %>
-  <label for="unique">Unique index</label>
+  <% %w{background unique sparse}.each do |check| %>
+    <input type="checkbox" name="<%= check %>" id="<%= check %>" value="false" %>
+    <label for="<%= check %>"><%= check.capitalize %></label>
+  <% end %>
 
   <input type="submit" value="Create index" />
+  <br />
 </form>
