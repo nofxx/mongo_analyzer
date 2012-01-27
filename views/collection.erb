@@ -1,0 +1,90 @@
+<div id="modal-change-profiling-level" class="modal">
+  <h2>Change profiling level</h2>
+
+  Set to
+  <a href="/profiling_level/<%= @database_name %>/off">Off</a>,
+  <a href="/profiling_level/<%= @database_name %>/slow_only">Slow only</a> <span class="small">(&gt; 100ms)</span>,
+  <a href="/profiling_level/<%= @database_name %>/all">Full</a>
+</div>
+
+<div id="modal-reset-query-log" class="modal">
+  <h2>Reset query log</h2>
+  This will remove all logged queries.
+  <br /><br />
+  <a href="/clear_query_log">Yes, please do that!</a>
+</div>
+
+<div id="modal-show-collections" class="modal">
+  <h2>Collectionsxx</h2>
+
+  <ul id="collections">
+  <% if @collection_names.size == 0 %>
+    <li>No collections</li>
+  <% else %>
+    <% @collection_names.each do |collection| %>
+      <li>
+        <%= collection %>
+        <ul>
+          <li><a href="/indexes/<%= URI.encode(collection) %>">Indexes</a></li>
+        </ul>
+      </li>
+    <% end %>
+  <% end %>
+  </ul>
+</div>
+
+<h1>Database: <%= @database_name %></h1>
+
+<dl id="db-stats">
+  <%#= @stats %>
+  <dt>Collections:</dt>
+  <dd><%= @collection_names.size %> <a href="#" id="show-collections">Show</a></dd>
+
+  <dt>Data size:</dt>
+    <dd><%= sprintf("%.2f", (@stats["dataSize"]/1024.to_f)/1024) %> MB
+    (<%= sprintf("%.2f", (@stats["storageSize"]/1024.to_f)/1024) %>) </dd>
+
+  <dt>Index size:</dt>
+    <dd><%= sprintf("%.2f", (@stats["indexSize"]/1024.to_f)/1024) %> MB (<%= @stats["indexes"] %>)</dd>
+
+  <dt>Objects:</dt>
+  <dd><%= sprintf("%.2f", (@stats["objects"]/1024.to_f)/1024) %> M
+    (<%= @stats["avgObjSize"].to_i %>b) </dd>
+</dl>
+
+<div id="profiling-level">
+  <h2>&raquo; Profiling level:</h2>
+  <%= @profiling_level %>
+  <a href="#" id="change-profiling-level">Change</a>
+  |
+  <a href="#" id="reset-query-log">Reset query log</a>
+</div>
+
+<table id="slow-queries">
+  <thead>
+    <tr>
+      <th id="slow-queries-date"><span>Date</span></th>
+      <th><span>Query</span></th>
+      <th><span>Size (b)</span></th>
+      <th><span>Objects (s|r)</span></th>
+      <th><span>Time (ms)</span></th>
+    </tr>
+  </thead>
+  <tbody>
+  <% if @profiles.size == 0 %>
+    <tr>
+      <td colspan="3" id="slow-queries-no-queries">No logged queries.</td>
+    </tr>
+  <% else %>
+  <% @profiles.each do |query| %>
+    <tr>
+      <td><%= query.ts %></td>
+      <td><%= query.summary %></td>
+      <td><%= query.size %></td>
+      <td><%= query.stats %></td>
+      <td><%= query.millis %></td>
+    </tr>
+  <% end %>
+  <% end %>
+  </tbody>
+</table>

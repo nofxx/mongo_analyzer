@@ -1,78 +1,36 @@
-<div id="modal-change-profiling-level" class="modal">
-  <h2>Change profiling level</h2>
 
-  Set to
-  <a href="/profiling_level/off">Off</a>,
-  <a href="/profiling_level/slow_only">Slow only</a> <span class="small">(&gt; 100ms)</span>,
-  <a href="/profiling_level/all">Full</a>
-</div>
-
-<div id="modal-reset-query-log" class="modal">
-  <h2>Reset query log</h2>
-  This will remove all logged queries.
-  <br /><br />
-  <a href="/clear_query_log">Yes, please do that!</a>
-</div>
-
-<div id="modal-show-collections" class="modal">
-  <h2>Collections</h2>
-
-  <ul id="collections">
-  <% if @collection_names.size == 0 %>
-    <li>No collections</li>
-  <% else %>
-    <% @collection_names.each do |collection| %>
-      <li>
-        <%= collection %>
-        <ul>
-          <li><a href="/indexes/<%= URI.encode(collection) %>">Indexes</a></li>
-        </ul>
-      </li>
-    <% end %>
-  <% end %>
-  </ul>
-</div>
-
-<h1>Database: <%= @database_name %></h1>
-
+<h1>Databases:</h1>
 <dl id="db-stats">
-  <dt>Collections:</dt>
-  <dd><%= @collection_names.size %> <a href="#" id="show-collections">Show</a></dd>
+  <%#= @stats %>
+  <dt>Databases:</dt>
+  <dd><%= @databases.size %> </dd>
 
-  <dt>Data size:</dt>
-  <dd><%= sprintf("%.2f", (@stats["dataSize"]/1024.to_f)/1024) %> MB</dd>
+  <dt>Mongodb:</dt>
+  <dd>v<%= @stats["version"] %> <%= @stats["bits"] %> bits
+     <%= sprintf("%.2f", (@stats["maxBsonObjectSize"]/1024.to_f)/1024) %> MB BSON Obj Size</dd>
 
-  <dt>Index size:</dt>
-  <dd><%= sprintf("%.2f", (@stats["indexSize"]/1024.to_f)/1024) %> MB</dd>
+  <dt>Sysinfo:</dt>
+  <dd><%= @stats["sysInfo"] %> </dd>
+
 </dl>
-
-<div id="profiling-level">
-  <h2>&raquo; Profiling level:</h2>
-  <%= @profiling_level %>
-  <a href="#" id="change-profiling-level">Change</a>
-  |
-  <a href="#" id="reset-query-log">Reset query log</a>
-</div>
 
 <table id="slow-queries">
   <thead>
     <tr>
-      <th id="slow-queries-date"><span>Date</span></th>
-      <th><span>Query</span></th>
-      <th><span>Time (ms)</span></th>
+      <th><span>Name</span></th>
+      <th><span>Size</span></th>
     </tr>
   </thead>
   <tbody>
-  <% if @slow_queries.size == 0 %>
+  <% if @databases == 0 %>
     <tr>
-      <td colspan="3" id="slow-queries-no-queries">No logged queries.</td>
+      <td colspan="3" id="slow-queries-no-queries">No databases.</td>
     </tr>
   <% else %>
-  <% @slow_queries.each do |query| %>
+  <% @databases.each do |name, size| %>
     <tr>
-      <td><%= query["ts"] %></td>
-      <td><%= query["info"] %></td>
-      <td><%= query["millis"] %></td>
+      <td><a href='/<%= name %>'><%= name %></a></td>
+      <td><dd><%= sprintf("%.2f", (size/1024.to_f)/1024) %> MB</td>
     </tr>
   <% end %>
   <% end %>

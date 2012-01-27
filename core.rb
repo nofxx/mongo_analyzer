@@ -20,19 +20,37 @@
 require 'erb'
 require 'uri'
 require 'yaml'
+require_relative 'lib/profile'
 
-config = YAML.load_file("config.yml")
 
-db = Mongo::Connection.new(config["mongodb"]["host"], config["mongodb"]["port"], {:slave_ok => true}).db(config["mongodb"]["database"])
-
-if config["mongodb"]["use_auth"]
-  db.authenticate(config["mongodb"]["username"], config["mongodb"]["password"], true)
+def connect name
+  config = YAML.load_file("config.yml")
+  conn = Mongo::Connection.new(config["mongodb"]["host"], config["mongodb"]["port"], {:slave_ok => true})
+  if name
+    db = conn.db(name)
+    if config["mongodb"]["use_auth"]
+      db.authenticate(config["mongodb"]["username"], config["mongodb"]["password"], true)
+    end
+    db
+  else
+    conn
+  end
 end
 
 skipped_collections = ["system.users", "system.indexes", "system.profile"]
 
 get '/' do
-  @database_name = config["mongodb"]["database"]
+  conn = connect false
+  @databases = conn.database_info
+  # skipped_databases.each...
+  @stats = conn.server_info
+
+  erb :home
+end
+
+get '/:collection' do
+  @database_name = params[:collection]
+  db = connect @database_name
   @collection_names = db.collection_names
   skipped_collections.each { |collection| @collection_names.delete(collection) }
 
@@ -42,14 +60,16 @@ get '/' do
     when :all then @profiling_level = "Full"
     else @profiling_level = "Unknown"
   end
- 
+
   # Slow queries. (Converted to array and flipped for better readable order)
-  @slow_queries = db.profiling_info.to_a.reverse
+  @profiles = Profile.all db
 
   @stats = db.stats
 
-  erb :home
+  erb :collection
 end
+
+
 
 get '/indexes/:collection' do
   coll = db.collection(params[:collection])
@@ -59,7 +79,8 @@ get '/indexes/:collection' do
 end
 
 # should be a post, but fuck this shit.
-get '/profiling_level/:what' do
+get '/profiling_level/:collection/:what' do
+  db = connect params[:collection]
   allowed_types = [:off, :slow_only, :all]
   what = params[:what].to_sym
 
@@ -71,7 +92,8 @@ get '/profiling_level/:what' do
   end
 end
 
-get '/clear_query_log' do
+get '/clear_query_log/:collection' do
+  db = connect params[:collection]
   # We must disable profiling before dropping the profile collection.
   old_profile_level = db.profiling_level
   db.profiling_level = :off
