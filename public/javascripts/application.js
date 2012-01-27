@@ -24,6 +24,27 @@ $(document).ready(function() {
     }
   })
   
+  $(".query-summary").bind("click", function(){
+		tr = $(this).parent();
+		params = {
+			ns: $(this).find('.query-ns:first').text(),
+			query: JSON.parse($(this).find('.query-dump:first').text()) // bad?
+		};
+    
+		body = "<table>" + tr.text()
+		body += "<h2>" + params['query'] + " </h2>";
+		body += "</table>";
+		body += "<h2>Explain:</h2><div id='explain-result'></div>";
+		$.modal(body, {
+		  overlayClose: true, 
+			minHeight: 200, 
+			minWidth: 400
+		});
+		$.post("/explain/" + $('#database_name').text(), params)
+			.success(function(data) {	$('#explain-result').html(data);});
+    return false;
+	})
+
   $(".confirm-link").bind("click", function(){
     if (confirm("Really?")) {
       window.location($(this).attr("href"));

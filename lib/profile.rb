@@ -1,29 +1,32 @@
 class Profile
-  attr_reader :ts, :ns, :op, :size, :millis, :command
+  attr_reader :ts, :ns, :op, :size, :millis
 
   def initialize hsh
-    @hsh = hsh
+    @id = hsh
     @ts, @ns, @millis = hsh["ts"], hsh["ns"], hsh["millis"]
     @op, @command, @query = hsh["op"], hsh["command"], hsh["query"]
-    @scanned, @returned, @size = hsh["nscanned"], hsh["nreturned"], hsh["responseLength"]
+    @scanned, @size = hsh["nscanned"], hsh["responseLength"]
+    @returned =  hsh["nreturned"] ||  hsh["ntoreturn"]
     @client, @user = hsh["client"], hsh["user"]
   end
 
-  def ns
-    @ns.gsub(/.*\./, "")
-  end
+  def id;    @ts.to_f              end
+  def ns;    @ns.gsub(/.*\./, "")  end
 
   def size # add 1.000 dots
     "#{@size}"
   end
 
-  def summary
-    @hsh
-    "#{ns} - #@op [#@command]"
+  def params
+    command || @query.to_json
+  end
+
+  def command
+    @command.nil? || @command.empty? ? nil : @command.to_json
   end
 
   def stats
-    @scanned ? "#@scanned|#@returned" : "0"
+    @scanned ? "#@scanned|#@returned" : @returned
   end
 
   def self.all db

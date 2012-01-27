@@ -20,6 +20,7 @@
 require 'erb'
 require 'uri'
 require 'yaml'
+require 'json'
 require_relative 'lib/profile'
 
 
@@ -136,4 +137,12 @@ post '/add_index/:database/:collection' do
   coll.create_index([[params[:index], ordering]], options)
 
   redirect "/indexes/#{params[:database]}/#{URI.escape(params[:collection])}"
+end
+
+post '/explain/:database' do
+  db = connect params[:database]
+  collection = params[:ns]
+  return 'sys' if collection =~ /^\$|indexes/
+  @explain = db[collection].find(params[:query]).explain
+  erb :explain, :layout => false
 end

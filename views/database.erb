@@ -33,7 +33,7 @@
   </ul>
 </div>
 
-<h1>Database: <%= @database_name %></h1>
+<h1>Database: <span id='database_name'><%= @database_name %></span></h1>
 
 <dl id="db-stats">
   <%#= @stats %>
@@ -79,7 +79,11 @@
   <% @profiles.each do |query| %>
     <tr>
       <td><%= query.ts %></td>
-      <td><%= query.summary %></td>
+      <td class='query-summary'>
+		    <span class='query-ns'><%= query.ns %></span>
+		    <span class='query-op'><%= query.op %></span>
+		    <span class='query-dump'><%= query.params %></span>
+			</td>
       <td><%= query.size %></td>
       <td><%= query.stats %></td>
       <td><%= query.millis %></td>
