@@ -66,7 +66,7 @@ get '/:database' do
 
   @stats = db.stats
 
-  erb :collection
+  erb :database
 end
 
 # should be a post, but fuck this shit.

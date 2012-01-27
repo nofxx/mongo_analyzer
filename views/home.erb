@@ -14,7 +14,7 @@
 
 </dl>
 
-<table id="slow-queries">
+<table id="databases">
   <thead>
     <tr>
       <th><span>Name</span></th>
@@ -24,7 +24,7 @@
   <tbody>
   <% if @databases == 0 %>
     <tr>
-      <td colspan="3" id="slow-queries-no-queries">No databases.</td>
+      <td colspan="3" id="databases-no-databases">No databases.</td>
     </tr>
   <% else %>
   <% @databases.each do |name, size| %>
