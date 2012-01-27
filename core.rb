@@ -80,13 +80,14 @@ end
 
 # should be a post, but fuck this shit.
 get '/profiling_level/:collection/:what' do
-  db = connect params[:collection]
+  @collection = params[:collection]
+  db = connect @collection
   allowed_types = [:off, :slow_only, :all]
   what = params[:what].to_sym
 
   if allowed_types.include?(what)
     db.profiling_level = what
-    redirect "/"
+    redirect "/#@collection"
   else
     "Not allowed profiling level: #{what}. Allowed: #{allowed_types.inspect}"
   end
@@ -104,7 +105,7 @@ get '/clear_query_log/:collection' do
   # Set profiling level back to old state.
   db.profiling_level = old_profile_level
 
-  redirect "/"
+  redirect "/#{params[:collection]}"
 end
 
 get '/drop_index/:collection/:index' do
