@@ -31,14 +31,12 @@ $(document).ready(function() {
 			query: JSON.parse(tr.find('.query-dump:first').text()) // bad?
 		};
     
-		body = "<table>" + tr.parent().text()
-		body += "<h2>" + params['query'] + " </h2>";
-		body += "</table>";
+		body = "<table>" + tr.parent().text() + "</table>";
 		body += "<h2>Explain:</h2><div id='explain-result'></div>";
 		$.modal(body, {
 		  overlayClose: true, 
 			minHeight: 200, 
-			minWidth: 400
+			minWidth: 650
 		});
 		$.post("/explain/" + $('#database_name').text(), params)
 			.success(function(data) {	$('#explain-result').html(data);});

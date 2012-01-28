@@ -1,4 +1,4 @@
-<p><b><%= @query %> </b><p>
+<p><%= @collection %> <b><%= @query %> </b><p>
 <% if @explain && !@explain.empty? %>
   <% @explain.map do |k,v| %>
 		<dd> <b> <%= k %> </b> <%= v %> </dd>

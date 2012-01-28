@@ -139,10 +139,22 @@ post '/add_index/:database/:collection' do
   redirect "/indexes/#{params[:database]}/#{URI.escape(params[:collection])}"
 end
 
+def rewrite query
+  query.each do |k,v|
+    if v.kind_of? Hash
+      v = v.has_key?("$oid") ? query[k] = "ObjectId('#{v['$oid']}')" : rewrite(v)
+    end
+  end
+  query
+end
+
 post '/explain/:database' do
   db = connect params[:database]
-  collection = params[:ns]
-  return 'sys' if collection =~ /^\$|indexes/
-  @explain = db[collection].find(params[:query]).explain
+  @collection = params[:ns]
+  return 'sys' if @collection =~ /^\$|indexes/
+  if params[:query]
+    @query = rewrite(params[:query])
+    @explain = db[@collection].find(@query).explain
+  end
   erb :explain, :layout => false
 end
