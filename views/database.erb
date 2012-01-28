@@ -83,7 +83,13 @@
       <td><%= query.ts %></td>
       <td class='query-summary'>
 		    <a class='query-explain' href='#'>[E]</a>
-		    <span class='query-ns <%= @collection_names.include?(query.ns) ? 'yellow' : 'gray' %>'><%= query.ns %></span>
+		    <% if @collection_names.include?(query.ns) %>
+		      <a class='query-indexes' href="/indexes/<%= @database_name + '/' + query.ns %>">[I]</a>
+  		    <span class='query-ns yellow'>
+        <% else %>
+  		    <span class='query-ns gray'>
+        <% end %>
+        <%= query.ns %></span>
 		    <span class='query-op'><%= query.op %></span>
 		    <span class='query-dump'><%= query.params %></span>
 			</td>

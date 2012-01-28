@@ -2,7 +2,7 @@ class Profile
   attr_reader :ts, :ns, :op, :size, :millis
 
   def initialize hsh
-    @id = hsh
+    @hsh = hsh
     @ts, @ns, @millis = hsh["ts"], hsh["ns"], hsh["millis"]
     @op, @command, @query = hsh["op"], hsh["command"], hsh["query"]
     @scanned, @size = hsh["nscanned"], hsh["responseLength"]
@@ -18,11 +18,11 @@ class Profile
   end
 
   def params
-    command || @query.to_json
+    (command || @query).to_json
   end
 
   def command
-    @command.nil? || @command.empty? ? nil : @command.to_json
+    @command.nil? || @command.empty? ? nil : @command
   end
 
   def stats
