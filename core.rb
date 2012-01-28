@@ -142,7 +142,7 @@ end
 def rewrite query
   query.each do |k,v|
     if v.kind_of? Hash
-      v = v.has_key?("$oid") ? query[k] = "ObjectId('#{v['$oid']}')" : rewrite(v)
+      v.has_key?("$oid") ? query[k] = "ObjectId('#{v['$oid']}')" : rewrite(v)
     end
   end
   query
@@ -151,9 +151,10 @@ end
 post '/explain/:database' do
   db = connect params[:database]
   @collection = params[:ns]
-  return 'sys' if @collection =~ /^\$|indexes/
-  if params[:query]
-    @query = rewrite(params[:query])
+  return 'sys indexes' if @collection =~ /indexes/
+  _params = @collection =~ /\$cmd/ ? params[:query]["query"] : params[:query]
+  if _params
+    @query = rewrite(_params)
     @explain = db[@collection].find(@query).explain
   end
   erb :explain, :layout => false
