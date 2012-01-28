@@ -23,15 +23,15 @@ $(document).ready(function() {
       $(this).addClass("tr-highlighted");
     }
   })
-  
-  $(".query-summary").bind("click", function(){
+   
+  $(".query-explain").click(function(){
 		tr = $(this).parent();
 		params = {
-			ns: $(this).find('.query-ns:first').text(),
-			query: JSON.parse($(this).find('.query-dump:first').text()) // bad?
+			ns: tr.find('.query-ns:first').text(),
+			query: JSON.parse(tr.find('.query-dump:first').text()) // bad?
 		};
     
-		body = "<table>" + tr.text()
+		body = "<table>" + tr.parent().text()
 		body += "<h2>" + params['query'] + " </h2>";
 		body += "</table>";
 		body += "<h2>Explain:</h2><div id='explain-result'></div>";
