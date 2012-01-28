@@ -36,7 +36,8 @@ $(document).ready(function() {
 		};
     
 		body = "<table>" + tr.parent().text() + "</table>";
-		body += "<h2>Explain:</h2><div id='explain-result'></div>";
+		body += "<h2>" + tr.find('.query-dump:first').text() + "</h2>";
+		body += "<br/><h2>Explain:</h2><div id='explain-result'></div>";
 		$.modal(body, {
 		  overlayClose: true, 
 			minHeight: 200, 
