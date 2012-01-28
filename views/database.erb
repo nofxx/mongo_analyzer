@@ -82,10 +82,10 @@
     <tr>
       <td><%= query.ts %></td>
       <td class='query-summary'>
-		    <span class='query-ns'><%= query.ns %></span>
+		    <a class='query-explain' href='#'>[E]</a>
+		    <span class='query-ns <%= @collection_names.include?(query.ns) ? 'yellow' : 'gray' %>'><%= query.ns %></span>
 		    <span class='query-op'><%= query.op %></span>
 		    <span class='query-dump'><%= query.params %></span>
-		    <a class='query-explain' href='#'>[E]</a>
 			</td>
       <td><%= query.size %></td>
       <td><%= query.stats %></td>

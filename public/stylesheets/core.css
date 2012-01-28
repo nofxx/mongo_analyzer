@@ -198,3 +198,11 @@ tbody tr:hover {
 #collections ul {
   margin-left: 5px;
 }
+
+.yellow {
+  color: #ff0;
+}
+
+.gray {
+  color: #aaa;
+}
