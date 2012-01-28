@@ -7,7 +7,10 @@ $(document).ready(function() {
   })
   
   $("#show-collections").bind("click", function(){
-    $("#modal-show-collections").modal();
+    $("#modal-show-collections").modal({
+		  overlayClose: true, 
+			minWidth: 200
+		});
     return false;
   })
   
@@ -28,6 +31,7 @@ $(document).ready(function() {
 		tr = $(this).parent();
 		params = {
 			ns: tr.find('.query-ns:first').text(),
+			// op:
 			query: JSON.parse(tr.find('.query-dump:first').text()) // bad?
 		};
     

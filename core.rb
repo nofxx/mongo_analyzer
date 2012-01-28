@@ -38,8 +38,6 @@ def connect name
   end
 end
 
-skipped_collections = ["system.users", "system.indexes", "system.profile"]
-
 get '/' do
   conn = connect false
   @databases = conn.database_info.sort_by {|k,v| v}.reverse
@@ -49,11 +47,17 @@ get '/' do
   erb :home
 end
 
+skipped_collections = ["system.users", "system.indexes", "system.profile"]
+
 get '/:database' do
   @database_name = params[:database]
   db = connect @database_name
-  @collection_names = db.collection_names
-  skipped_collections.each { |collection| @collection_names.delete(collection) }
+  collection_names = db.collection_names
+
+  @collections = collection_names.reduce({}) do |k,c|
+    next k if skipped_collections.include?(c)
+    k[c] = db[c].count; k
+  end
 
   case db.profiling_level
     when :off then @profiling_level = "Off"

@@ -18,12 +18,12 @@
   <h2>Collections</h2>
 
   <ul id="collections">
-  <% if @collection_names.size == 0 %>
+  <% if @collections.size == 0 %>
     <li>No collections</li>
   <% else %>
-    <% @collection_names.each do |collection| %>
+    <% @collections.each do |collection, count| %>
       <li>
-        <%= collection %>
+        <%= collection %> (<%= count %>)
         <ul>
           <li><a href="/indexes/<%= @database_name + '/' + URI.encode(collection) %>">Indexes</a></li>
         </ul>
@@ -38,7 +38,7 @@
 <dl id="db-stats">
   <%#= @stats %>
   <dt>Collections:</dt>
-  <dd><%= @collection_names.size %> <a href="#" id="show-collections">Show</a></dd>
+  <dd><%= @collections.size %> <a href="#" id="show-collections">Show</a></dd>
 
   <dt>Data size:</dt>
     <dd><%= sprintf("%.2f", (@stats["dataSize"]/1024.to_f)/1024) %> MB
@@ -82,17 +82,17 @@
     <tr>
       <td><%= query.ts %></td>
       <td class='query-summary'>
-		    <a class='query-explain' href='#'>[E]</a>
-		    <% if @collection_names.include?(query.ns) %>
-		      <a class='query-indexes' href="/indexes/<%= @database_name + '/' + query.ns %>">[I]</a>
-  		    <span class='query-ns yellow'>
+        <a class='query-explain' href='#'>[E]</a>
+        <% if @collections.keys.include?(query.ns) %>
+          <a class='query-indexes' href="/indexes/<%= @database_name + '/' + query.ns %>">[I]</a>
+          <span class='query-ns yellow'>
         <% else %>
-  		    <span class='query-ns gray'>
+          <span class='query-ns gray'>
         <% end %>
         <%= query.ns %></span>
-		    <span class='query-op'><%= query.op %></span>
-		    <span class='query-dump'><%= query.params %></span>
-			</td>
+        <span class='query-op'><%= query.op %></span>
+        <span class='query-dump'><%= query.params %></span>
+      </td>
       <td><%= query.size %></td>
       <td><%= query.stats %></td>
       <td><%= query.millis %></td>
